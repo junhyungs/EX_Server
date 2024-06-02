@@ -15,7 +15,7 @@ public class LoginPopup : MonoBehaviour
 
     [SerializeField] Text Text_Error;
 
-    //[SerializeField] NetworkingManager m_NetManager;
+    [SerializeField] NetworkingManager m_NetManager;
 
     public static LoginPopup Instance { get; private set; }
     private string m_OriginNetworkAddress;
@@ -54,6 +54,20 @@ public class LoginPopup : MonoBehaviour
         m_OriginNetworkAddress = NetworkManager.singleton.networkAddress;
 
     }
+    public void SetUIOnAuthValueChanged()
+    {//네트워크 인증자(클라) UI유저명 변경 처리
+        //로그인 팝업에 유저명 변경 시 네트워크 인증자에 관련 정보 수정
+        Text_Error.text = string.Empty;
+        Text_Error.gameObject.SetActive(false);
+    }
+
+    public void SetUIOnAuthError(string msg)
+    {
+        //네트워크 인증자(클라) 인증 응답 시 처리
+        Text_Error.text = msg;
+        Text_Error.gameObject.SetActive(true); 
+    }
+
     private void CheckNetworkAddressValidOnUpdate()
     {
         if (string.IsNullOrWhiteSpace(NetworkManager.singleton.networkAddress))
@@ -79,6 +93,24 @@ public class LoginPopup : MonoBehaviour
         bool isUserNameValid = !string.IsNullOrWhiteSpace(userName);
         Btn_StartAsHostServer.interactable = isUserNameValid;
         Btn_StartAsClient.interactable = isUserNameValid;
+    }
+
+    public void OnClick_StartAsHost()
+    {
+        if (m_NetManager == null)
+            return;
+
+        m_NetManager.StartHost();
+        this.gameObject.SetActive(false);
+    }
+
+    public void OnClick_StartAsClient()
+    {
+        if (m_NetManager == null)
+            return;
+
+        m_NetManager.StartClient();
+        this.gameObject.SetActive(false);
     }
     
 }

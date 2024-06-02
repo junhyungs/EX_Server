@@ -21,14 +21,19 @@ public class ChattingUI : NetworkBehaviour
     //- OnStartServer() / 서버 시작 시, 해당 Dictionary 초기화
     // 서버온리 - 연결된 플레이어들 이름
     private static readonly Dictionary<NetworkConnectionToClient,string> m_connectedNameDic = new Dictionary<NetworkConnectionToClient, string>();
-
+    public void SetLocalPlayerName(string userName)
+    {
+        m_LocalPlayerName = userName;
+    }
     public override void OnStartServer()
     {
+        this.gameObject.SetActive(true);
         m_connectedNameDic.Clear();
     }
 
     public override void OnStartClient()
     {
+        this.gameObject.SetActive(true);
         Text_ChatHistroy.text = string.Empty;
     }
 
@@ -38,8 +43,8 @@ public class ChattingUI : NetworkBehaviour
         if (!m_connectedNameDic.ContainsKey(sender))
         {
             ChatUser player = sender.identity.GetComponent<ChatUser>();
-            //string playerName = player.PlayerName;
-         //   m_connectedNameDic.Add(sender, playerName);
+            string playerName = player.m_playerName;
+            m_connectedNameDic.Add(sender, playerName);
         }
 
         if (!string.IsNullOrWhiteSpace(msg))
