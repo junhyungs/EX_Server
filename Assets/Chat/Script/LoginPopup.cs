@@ -25,4 +25,46 @@ public class LoginPopup : MonoBehaviour
         Instance = this;
         Text_Error.gameObject.SetActive(false);
     }
+
+    private void Start()
+    {
+        SetDefaultNetworkAddress();
+    }
+    private void OnEnable()
+    {
+        
+    }
+    private void OnDisable()
+    {
+        
+    }
+    private void Update()
+    {
+        CheckNetworkAddressValidOnUpdate();
+    }
+
+    private void SetDefaultNetworkAddress()
+    {
+        //네트워크 주소가 없는 경우 디폴트 세팅
+        if (string.IsNullOrWhiteSpace(NetworkManager.singleton.networkAddress))
+        {
+            NetworkManager.singleton.networkAddress = "localhost";
+        }
+        //네트워크 주소 공란으로 변경될 경우를 대비해 기존 네트워크 주소 보관
+        m_OriginNetworkAddress = NetworkManager.singleton.networkAddress;
+
+    }
+    private void CheckNetworkAddressValidOnUpdate()
+    {
+        if (string.IsNullOrWhiteSpace(NetworkManager.singleton.networkAddress))
+        {
+            NetworkManager.singleton.networkAddress = m_OriginNetworkAddress;
+        }
+
+        if(Input_NetworkAdress.text != NetworkManager.singleton.networkAddress)
+        {
+            Input_NetworkAdress.text = NetworkManager.singleton.networkAddress;
+        }
+    }
+    
 }
