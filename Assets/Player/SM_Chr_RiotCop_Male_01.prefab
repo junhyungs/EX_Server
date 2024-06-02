@@ -880,6 +880,7 @@ GameObject:
   - component: {fileID: 2783495325421243249}
   - component: {fileID: 3062533115564064155}
   - component: {fileID: 3377934564939815117}
+  - component: {fileID: 1834465751}
   m_Layer: 0
   m_Name: SM_Chr_RiotCop_Male_01
   m_TagString: Untagged
@@ -996,6 +997,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e0ef3c038668cd459eeac4a35b57d27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_input: {x: 0, y: 0}
+  m_sprint: 0
 --- !u!114 &3377934564939815117
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1008,6 +1011,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67a0addb7b45f3b4a9841349c70c70f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WalkSpeed: 1
+  SprintSpeed: 3
+  ChangeSpeed: 10
+--- !u!143 &1834465751
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2083280867021162989}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 1.76
+  m_Radius: 0.27
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0
+  m_Center: {x: 0, y: 0.99, z: 0}
 --- !u!1 &2083280964201353625
 GameObject:
   m_ObjectHideFlags: 0

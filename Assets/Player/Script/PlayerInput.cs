@@ -11,8 +11,15 @@ public class PlayerInput : MonoBehaviour
     [Header("IsSprint")]
     [SerializeField] private bool m_sprint;
 
-    public Vector2 inputSystem { get; private set; }
-    public bool sprint { get; set; }
+    public Vector2 inputValue
+    {
+        get { return m_input; }
+    }
+    public bool sprint
+    {
+        get { return m_sprint; }
+        set { m_sprint = value; }
+    }
     
     private void OnMove(InputValue inputValue)
     {
