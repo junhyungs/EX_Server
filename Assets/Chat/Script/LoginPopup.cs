@@ -32,11 +32,11 @@ public class LoginPopup : MonoBehaviour
     }
     private void OnEnable()
     {
-        
+        Input_User_Name.onValueChanged.AddListener(OnValueChanged_ToggleButton);
     }
     private void OnDisable()
     {
-        
+        Input_User_Name.onValueChanged.RemoveListener(OnValueChanged_ToggleButton); 
     }
     private void Update()
     {
@@ -65,6 +65,13 @@ public class LoginPopup : MonoBehaviour
         {
             Input_NetworkAdress.text = NetworkManager.singleton.networkAddress;
         }
+    }
+
+    public void OnValueChanged_ToggleButton(string userName)
+    {
+        bool isUserNameValid = !string.IsNullOrWhiteSpace(userName);
+        Btn_StartAsHostServer.interactable = isUserNameValid;
+        Btn_StartAsClient.interactable = isUserNameValid;
     }
     
 }
