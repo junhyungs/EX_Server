@@ -26,18 +26,20 @@ public class ChattingUI : NetworkBehaviour
     {
         m_connectedNameDic.Clear();
     }
+
     public override void OnStartClient()
     {
         Text_ChatHistroy.text = string.Empty;
     }
+
     [Command(requiresAuthority = false)]//커맨드라는 어트리뷰트를 이용해 클라에서 서버로 특정 기능수행을 요청한다.
     private void CommandSendMsg(string msg, NetworkConnectionToClient sender = null)
     {
         if (!m_connectedNameDic.ContainsKey(sender))
         {
             ChatUser player = sender.identity.GetComponent<ChatUser>();
-            string playerName = player.PlayerName;
-            m_connectedNameDic.Add(sender, playerName);
+            //string playerName = player.PlayerName;
+         //   m_connectedNameDic.Add(sender, playerName);
         }
 
         if (!string.IsNullOrWhiteSpace(msg))
@@ -46,6 +48,11 @@ public class ChattingUI : NetworkBehaviour
             OnRecvMessge(senderName, msg.Trim());
         }
     }
+    public void RemoveNameOnServerDisconnect(NetworkConnectionToClient conn)
+    {
+        m_connectedNameDic.Remove(conn);
+    }
+
     [ClientRpc]//서버사이드에서 모든 클라이언트에게 특정 함수를 실행시킬 수 있도록 클라이언트RPC를 붙인다.
     private void OnRecvMessge(string senderName, string msg)
     {// 전송자와 현재 플레이어의 이름 비교 후 메세지 포매팅(색)
