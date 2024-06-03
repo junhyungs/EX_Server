@@ -37,6 +37,9 @@ public class PlayerController : NetworkBehaviour
     [SyncVar]
     private float m_Speed;
 
+    [SyncVar]
+    Vector2 TestValue;
+
     void Start()
     {
         m_Controller = GetComponent<CharacterController>();
@@ -98,11 +101,12 @@ public class PlayerController : NetworkBehaviour
         else
             m_Speed = targetSpeed;
 
-        Vector3 inputDirection = transform.TransformDirection(new Vector3(m_Input.inputValue.x, 0, m_Input.inputValue.y).normalized);
-        RotatePlayer();
-        AnimatorPlay(m_Speed, m_Input.inputValue);
+        //Vector3 inputDirection = transform.TransformDirection(new Vector3(m_Input.inputValue.x, 0, m_Input.inputValue.y).normalized);
 
-        m_Controller.Move(inputDirection * m_Speed * Time.deltaTime);
+        RotatePlayer();
+        TestValue = m_Input.inputValue;
+        AnimatorPlay(m_Speed, TestValue);
+        //m_Controller.Move(inputDirection * m_Speed * Time.deltaTime);
     }
 
 
@@ -121,10 +125,11 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+
     [Command]
     private void AnimatorPlay(float speed, Vector2 input)
     {
-        AnimatorMove(speed, input); 
+        AnimatorMove(speed, input);
     }
 
     [ClientRpc]
