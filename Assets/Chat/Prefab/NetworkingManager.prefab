@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7348167016082656952
 Transform:
   m_ObjectHideFlags: 0
@@ -75,7 +75,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f8d3d5eaa653304db67bcaf0520b763, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dontDestroyOnLoad: 1
+  dontDestroyOnLoad: 0
   runInBackground: 1
   headlessStartMode: 1
   editorAutoStart: 0
@@ -109,8 +109,8 @@ MonoBehaviour:
   evaluationMethod: 0
   evaluationInterval: 3
   timeInterpolationGui: 0
-  m_LoginPopup: {fileID: 5843583972671883761, guid: 6c65ae3eabf5bac4e924bc8bdf9ccb49, type: 3}
-  m_ChattingUI: {fileID: 8606452105347698836, guid: 7e453ded58f3626429e245035ef09099, type: 3}
+  m_LoginPopup: {fileID: 0}
+  m_ChattingUI: {fileID: 0}
 --- !u!114 &5972590124135784149
 MonoBehaviour:
   m_ObjectHideFlags: 0

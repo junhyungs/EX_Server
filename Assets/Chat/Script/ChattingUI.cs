@@ -42,14 +42,15 @@ public class ChattingUI : NetworkBehaviour
     {
         if (!m_connectedNameDic.ContainsKey(sender))
         {
-            ChatUser player = sender.identity.GetComponent<ChatUser>();
-            string playerName = player.m_playerName;
+            var player = sender.identity.GetComponent<ChatUser>();
+            var playerName = player.m_playerName;
             m_connectedNameDic.Add(sender, playerName);
         }
 
         if (!string.IsNullOrWhiteSpace(msg))
         {
             var senderName = m_connectedNameDic[sender];
+            
             OnRecvMessge(senderName, msg.Trim());
         }
     }
@@ -62,9 +63,9 @@ public class ChattingUI : NetworkBehaviour
     private void OnRecvMessge(string senderName, string msg)
     {// 전송자와 현재 플레이어의 이름 비교 후 메세지 포매팅(색)
         string formatedMsg = (senderName == m_LocalPlayerName) ?
-            $"<color = red>{senderName}:</color>{msg}" :
-            $"<color = blue>{senderName}:</color>{msg}";
-
+            $"<color=red>{senderName}:</color> {msg}" :
+            $"<color=blue>{senderName}:</color> {msg}";
+        
         AppendMessage(formatedMsg);
     }
 

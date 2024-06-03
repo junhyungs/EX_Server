@@ -9,12 +9,12 @@ public partial class NetworkingAuthenticator : NetworkAuthenticator//인증자 구현
     //네트워크 인증자(서버)인증, 연결여부 관리 컨테이너 추가
     readonly HashSet<NetworkConnection> m_connectionsPendingDisconnect = new HashSet<NetworkConnection>();
     internal static readonly HashSet<string> m_playerNames = new HashSet<string>();
-    public struct AuthRequestMsg : NetworkMessage//네트워크 인증자 인증 전용 네트워크 메세지 추가
+    public struct AuthReqMsg : NetworkMessage//네트워크 인증자 인증 전용 네트워크 메세지 추가
     {
         //인증을 위해 사용
         public string authUserName;
     }
-    public struct AuthResiveMsg : NetworkMessage//네트워크 인증자 인증 전용 네트워크 메세지 추가
+    public struct AuthResMsg : NetworkMessage//네트워크 인증자 인증 전용 네트워크 메세지 추가
     {
         public byte code;
         public string message;
@@ -28,18 +28,19 @@ public partial class NetworkingAuthenticator : NetworkAuthenticator//인증자 구현
     public override void OnStartServer()//네트워크 인증자 클라 인증 요청 처리용 이벤트 등록
     {
         //클라로부터 인증 요청 처리를 위한 핸들러 연결
-        NetworkServer.RegisterHandler<AuthRequestMsg>(OnAuthRequestMessage,false);
+        NetworkServer.RegisterHandler<AuthReqMsg>(OnAuthRequestMessage, false);
     }
     public override void OnStopServer()//네트워크 인증자 클라 인증 요청 처리용 이벤트 등록
     {
-        NetworkServer.UnregisterHandler<AuthResiveMsg>();
+        NetworkServer.UnregisterHandler<AuthResMsg>();
     }
     public override void OnServerAuthenticate(NetworkConnectionToClient conn)
     {
         
     }
-    public void OnAuthRequestMessage(NetworkConnectionToClient conn,AuthRequestMsg msg)
+    public void OnAuthRequestMessage(NetworkConnectionToClient conn, AuthReqMsg msg)
     {
+        Debug.Log(msg.authUserName);
         //클라 인증 요청 메세지 도착 시 처리
         if(m_connectionsPendingDisconnect.Contains(conn))
         {
@@ -53,7 +54,7 @@ public partial class NetworkingAuthenticator : NetworkAuthenticator//인증자 구현
             m_playerNames.Add(msg.authUserName);
             conn.authenticationData = msg.authUserName;
 
-            AuthResiveMsg authResMsg = new AuthResiveMsg
+            AuthResMsg authResMsg = new AuthResMsg
             {
                 code = 100,
                 message = "Auth Success"
@@ -66,7 +67,7 @@ public partial class NetworkingAuthenticator : NetworkAuthenticator//인증자 구현
         {
             m_connectionsPendingDisconnect.Add(conn);
 
-            AuthResiveMsg authResMsg = new AuthResiveMsg
+            AuthResMsg authResMsg = new AuthResMsg
             {
                 code = 200,
                 message = "User Name already in use! Try again!"

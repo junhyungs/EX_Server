@@ -21,20 +21,20 @@ public partial class NetworkingAuthenticator
     public override void OnStartClient()
     {
         //네트워크 인증자(클라) 인증 응답 처리부 이벤트 등록과 해제
-        NetworkClient.RegisterHandler<AuthResiveMsg>(OnAuthResponseMessage, false);
+        NetworkClient.RegisterHandler<AuthResMsg>(OnAuthResponseMessage, false);
     }
     public override void OnStopClient()
     {
         //네트워크 인증자(클라) 인증 응답 처리부 이벤트 등록과 해제
-        NetworkClient.UnregisterHandler<AuthResiveMsg>();
+        NetworkClient.UnregisterHandler<AuthResMsg>();
     }
     public override void OnClientAuthenticate()
     {
         //클라 인증 요청 시 불려지는 함수
-        NetworkClient.Send(new AuthRequestMsg { authUserName = m_PlayerName });
+        NetworkClient.Send(new AuthReqMsg { authUserName = m_PlayerName });
         //네트워크(클라) 인증 요청 시 패킷을 만들어서 전송
     }
-    public void OnAuthResponseMessage(AuthResiveMsg msg)
+    public void OnAuthResponseMessage(AuthResMsg msg)
     {
         if(msg.code == 100)//인증 성공
         {

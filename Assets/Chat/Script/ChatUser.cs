@@ -18,9 +18,11 @@ public class ChatUser : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         var objChatUI = GameObject.Find("ChanttingUI");
+
         if(objChatUI != null)
         {
             var chattingUI = objChatUI.GetComponent<ChattingUI>();
+
             if(chattingUI != null)
             {
                 chattingUI.SetLocalPlayerName(m_playerName);
