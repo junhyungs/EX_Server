@@ -48,17 +48,35 @@ public class PlayerController : NetworkBehaviour
         TextMesh_NetType.text = this.isLocalPlayer ? $"[로컬/{netTypeStr}]" 
             : $"[로컬아님/{netTypeStr}]{this.netId}";
 
+        SetHPBarOnUpdate(m_Health);
 
-        if (Input.GetMouseButtonDown(0))
+        if (CheckIsFocusedOnUpdate())
         {
-            CommandAtk();
-        }
+            if (Input.GetMouseButtonDown(0))
+            {
+                CommandAtk();
+            }
 
-        Move();
+            Move();
+        }
+    }
+    private void SetHPBarOnUpdate(int health)
+    {
+        TextMesh_HealthBar.text = new string('-', health);
     }
 
+    private bool CheckIsFocusedOnUpdate()
+    {
+        return Application.isFocused;
+    }
+    
     private void Move()
     {
+        if (this.isLocalPlayer == false)
+            return;
+
+
+
         targetSpeed = m_Input.sprint ? SprintSpeed : WalkSpeed;
         
         if (m_Input.inputValue == Vector2.zero)
