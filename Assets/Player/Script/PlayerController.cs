@@ -29,11 +29,12 @@ public class PlayerController : NetworkBehaviour
     [Header("PlayerAnimator")]
     public Animator m_Animator;
 
-
     private CharacterController m_Controller;
     private PlayerInput m_Input;
-    
+
+    [SyncVar]
     private float targetSpeed;
+    [SyncVar]
     private float m_Speed;
 
     void Start()
@@ -77,8 +78,6 @@ public class PlayerController : NetworkBehaviour
         if (this.isLocalPlayer == false)
             return;
 
-
-
         targetSpeed = m_Input.sprint ? SprintSpeed : WalkSpeed;
         
         if (m_Input.inputValue == Vector2.zero)
@@ -102,9 +101,10 @@ public class PlayerController : NetworkBehaviour
         Vector3 inputDirection = transform.TransformDirection(new Vector3(m_Input.inputValue.x, 0, m_Input.inputValue.y).normalized);
         RotatePlayer();
         AnimatorPlay(m_Speed, m_Input.inputValue);
-        
+
         m_Controller.Move(inputDirection * m_Speed * Time.deltaTime);
     }
+
 
     private void RotatePlayer()
     {
@@ -121,7 +121,14 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    [Command]
     private void AnimatorPlay(float speed, Vector2 input)
+    {
+        AnimatorMove(speed, input); 
+    }
+
+    [ClientRpc]
+    private void AnimatorMove(float speed, Vector2 input)
     {
         if (input == Vector2.zero)
             speed = 0;
