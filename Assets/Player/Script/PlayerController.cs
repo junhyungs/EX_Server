@@ -52,13 +52,15 @@ public class PlayerController : NetworkBehaviour
 
         if (CheckIsFocusedOnUpdate())
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                CommandAtk();
-            }
-
-            Move();
+            return;
         }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            CommandAtk();
+        }
+
+        Move();
     }
     private void SetHPBarOnUpdate(int health)
     {
