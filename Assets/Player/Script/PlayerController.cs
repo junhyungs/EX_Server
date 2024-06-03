@@ -50,7 +50,7 @@ public class PlayerController : NetworkBehaviour
 
         SetHPBarOnUpdate(m_Health);
 
-        if (CheckIsFocusedOnUpdate())
+        if (CheckIsFocusedOnUpdate() == false)
         {
             return;
         }
