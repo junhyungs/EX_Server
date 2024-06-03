@@ -50,7 +50,7 @@ public class PlayerController : NetworkBehaviour
 
         SetHPBarOnUpdate(m_Health);
 
-        if (CheckIsFocusedOnUpdate())
+        if (CheckIsFocusedOnUpdate() == false)
         {
             return;
         }
@@ -76,8 +76,6 @@ public class PlayerController : NetworkBehaviour
     {
         if (this.isLocalPlayer == false)
             return;
-
-
 
         targetSpeed = m_Input.sprint ? SprintSpeed : WalkSpeed;
         
