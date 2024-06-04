@@ -6,7 +6,7 @@ using Mirror;
 
 
 
-public class PlayerController : NetworkBehaviour
+public class PlayerController : Singleton<PlayerController>
 {
     [Header("Speed")]
     [SerializeField] private float WalkSpeed;
@@ -15,25 +15,18 @@ public class PlayerController : NetworkBehaviour
     [Header("ChangeSpeed")]
     [SerializeField] private float ChangeSpeed;
 
-    [Header("HealthBar")]
-    public TextMesh TextMesh_HealthBar;
     [Header("NetType")]
     public TextMesh TextMesh_NetType;
 
     [Header("Attack")]
     public GameObject m_prefab_AtkObject;
     public Transform m_Transform_AtkSpawnPos;
-
-    [Header("Stats Server")]
-    [SyncVar] public int m_Health = 4;
-    //이 변수가 네트워크를 통해 동기화 되어야 함을 나타낸다. 이 변수 값이
-    //변경되면 네트워크를 통해 클라간에 동기화된다.
+    
     [Header("PlayerAnimator")]
     public Animator m_Animator;
 
     private CharacterController m_Controller;
     private PlayerInput m_Input;
-    private NetworkTransformUnreliable m_NetTransUn;
 
     [SyncVar]
     private float targetSpeed;
@@ -45,24 +38,16 @@ public class PlayerController : NetworkBehaviour
     {
         m_Controller = GetComponent<CharacterController>();
         m_Input = GetComponent<PlayerInput>();
-        m_NetTransUn = GetComponent<NetworkTransformUnreliable>();
-
-        m_NetTransUn.syncInterval = 0.1f;
     }
-
-    //private void FixedUpdate()
-    //{
-        
-    //}
 
     private void Update()
     {
-        string netTypeStr = isClient ? "Client(O)" : "Client(X)";
-        TextMesh_NetType.text = this.isLocalPlayer ? $"[로컬/{netTypeStr}]"
-            : $"[로컬아님/{netTypeStr}]{this.netId}";
+        //string netTypeStr = isClient ? "Client(O)" : "Client(X)";
+        //TextMesh_NetType.text = this.isLocalPlayer ? $"[로컬/{netTypeStr}]"
+        //    : $"[로컬아님/{netTypeStr}]{this.netId}";
 
-        SetHPBarOnUpdate(m_Health);
-
+        //창(게임 씬)이 선택되어있지 않다면 아래 메소드를 실행하지 않겠다.
+        //이 조건문을 기준으로 항상 실행해야하는 메소드와 창이 선택(플레이)중에만 실행해야하는 메소드를 나눌 수 있는듯.
         if (CheckIsFocusedOnUpdate() == false)
         {
             return;
@@ -75,12 +60,6 @@ public class PlayerController : NetworkBehaviour
 
         Move();
     }
-
-    private void SetHPBarOnUpdate(int health)
-    {
-        TextMesh_HealthBar.text = new string('-', health);
-    }
-
     private bool CheckIsFocusedOnUpdate()
     {
         return Application.isFocused;
@@ -173,22 +152,8 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     private void RpcOnAttack()
     {
-        Debug.Log($"{this.netId}가 RPC호출함");
+        m_Animator.SetTrigger("Fire");
         //Fire 애니메이션
-    }
-
-    [ServerCallback]
-    private void OnTriggerEnter(Collider other)
-    {
-        var AtkGenObject = other.GetComponent<AttackSpawnObject>();
-
-        if (AtkGenObject == null)
-            return;
-
-        m_Health--;
-
-        if (m_Health <= 0)
-            NetworkServer.Destroy(this.gameObject);
     }
 
 }

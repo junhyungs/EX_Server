@@ -16,6 +16,7 @@ public class AttackSpawnObject : NetworkBehaviour
 
     private void Start()
     {
+        m_Rigid.useGravity = false;
         m_Rigid.AddForce(transform.forward * m_Force);
     }
 
@@ -29,7 +30,7 @@ public class AttackSpawnObject : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.layer == LayerMask.NameToLayer(""))
+        if(other.gameObject.layer == LayerMask.NameToLayer("Zombie"))
             DestroySelf();
     }
 
