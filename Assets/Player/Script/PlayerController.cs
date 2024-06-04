@@ -138,7 +138,8 @@ public class PlayerController : Singleton<PlayerController>
     [Command]
     private void CommandAtk()
     {
-        GameObject attackObjectForSpawn = Instantiate(m_prefab_AtkObject, m_Transform_AtkSpawnPos.position, Quaternion.identity);
+        GameObject attackObjectForSpawn = PoolManager.Instance.GetBullet();
+        attackObjectForSpawn.transform.position = m_Transform_AtkSpawnPos.position;
         attackObjectForSpawn.transform.rotation = transform.rotation;
         NetworkServer.Spawn(attackObjectForSpawn);
 
@@ -149,7 +150,7 @@ public class PlayerController : Singleton<PlayerController>
     private void RpcOnAttack()
     {
         m_Animator.SetTrigger("Fire");
-        ParticleManager.Instance.OnEable_GunShot();
+        
         //Fire 애니메이션
     }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
+
 public class AttackSpawnObject : NetworkBehaviour
 {
     public float m_DestroyAfter = 5.0f;
@@ -20,14 +21,26 @@ public class AttackSpawnObject : NetworkBehaviour
         m_Rigid.AddForce(transform.forward * m_Force);
     }
 
+    //[Server]
+    //private void DestroySelf()
+    //{
+    //    //NetworkServer.Destroy(this.gameObject);
+    //    this.gameObject.SetActive(false);
+    //}
+
     [Server]
     private void DestroySelf()
     {
-        NetworkServer.Destroy(this.gameObject);
+        DeActiveObj();
+    }
+
+    [ClientRpc]
+    private void DeActiveObj()
+    {
+        this.gameObject.SetActive(false);   
     }
 
     [ServerCallback]
-
     private void OnTriggerEnter(Collider other)
     {
         if(other.gameObject.layer == LayerMask.NameToLayer("Zombie"))

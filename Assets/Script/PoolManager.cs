@@ -1,3 +1,4 @@
+using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,13 +14,18 @@ public class PoolManager : Singleton<PoolManager>
     private Queue<GameObject>[] BulletPool;
     private Queue<GameObject>[] ZombiePool;
 
-    void Start()
+    public override void OnStartServer()
     {
         BulletPool = new Queue<GameObject>[Bullet.Length];
         ZombiePool = new Queue<GameObject>[Zombie.Length];
         InitPool();
     }
+    void Start()
+    {
+        
+    }
 
+    
     private void InitPool()
     {
         for(int i = 0; i < Bullet.Length; i++)
@@ -67,15 +73,17 @@ public class PoolManager : Singleton<PoolManager>
             ZombiePool[3].Enqueue(zombiePrefab);
         }
     }
-    
+
+
     public GameObject GetBullet()
     {
         GameObject bullet = BulletPool[0].Dequeue();
+        bullet.transform.rotation = Quaternion.identity;
         BulletPool[0].Enqueue(bullet);
         bullet.SetActive(true);
         return bullet;  
     }
-
+   
     public GameObject GetZombie()
     {
         int PoolNumber = Random.Range(0, 4);
