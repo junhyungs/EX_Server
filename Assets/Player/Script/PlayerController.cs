@@ -10,8 +10,10 @@ public class PlayerController : Singleton<PlayerController>
 {
     [Header("Speed")]
     [SerializeField] private float WalkSpeed;
+
     [Header("SprintSpeed")]
     [SerializeField] private float SprintSpeed;
+
     [Header("ChangeSpeed")]
     [SerializeField] private float ChangeSpeed;
 
@@ -42,10 +44,6 @@ public class PlayerController : Singleton<PlayerController>
 
     private void Update()
     {
-        //string netTypeStr = isClient ? "Client(O)" : "Client(X)";
-        //TextMesh_NetType.text = this.isLocalPlayer ? $"[로컬/{netTypeStr}]"
-        //    : $"[로컬아님/{netTypeStr}]{this.netId}";
-
         //창(게임 씬)이 선택되어있지 않다면 아래 메소드를 실행하지 않겠다.
         //이 조건문을 기준으로 항상 실행해야하는 메소드와 창이 선택(플레이)중에만 실행해야하는 메소드를 나눌 수 있는듯.
         if (CheckIsFocusedOnUpdate() == false)
@@ -53,7 +51,7 @@ public class PlayerController : Singleton<PlayerController>
             return;
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
         {
             CommandAtk();
         }
@@ -92,7 +90,6 @@ public class PlayerController : Singleton<PlayerController>
 
         RotatePlayer();
         AnimatorPlay(m_Speed,m_Input.inputValue);
-
         //Vector3 inputDir = transform.TransformDirection(new Vector3(m_Input.inputValue.x, 0, m_Input.inputValue.y)).normalized;
         //PlayerMove(m_Speed, inputDir);
     }
@@ -112,7 +109,6 @@ public class PlayerController : Singleton<PlayerController>
 
         }
     }
-
 
     //[Command]
     //private void PlayerMove(float speed, Vector3 input)
@@ -153,6 +149,7 @@ public class PlayerController : Singleton<PlayerController>
     private void RpcOnAttack()
     {
         m_Animator.SetTrigger("Fire");
+        ParticleManager.Instance.OnEable_GunShot();
         //Fire 애니메이션
     }
 
