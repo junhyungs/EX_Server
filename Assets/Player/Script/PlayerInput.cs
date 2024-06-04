@@ -2,12 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Mirror;
 
 
-public class PlayerInput : MonoBehaviour
+public class PlayerInput : NetworkBehaviour
 {
     [Header("InputVector")]
-    [SerializeField] private Vector2 m_input;
+    [SerializeField]
+    [SyncVar]
+    private Vector2 m_input;
     [Header("IsSprint")]
     [SerializeField] private bool m_sprint;
 

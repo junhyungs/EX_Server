@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
+
 public class PlayerController : NetworkBehaviour
 {
     [Header("Speed")]
@@ -31,6 +32,7 @@ public class PlayerController : NetworkBehaviour
 
     private CharacterController m_Controller;
     private PlayerInput m_Input;
+    //private NetworkAnimator m_Animator;
 
     [SyncVar]
     private float targetSpeed;
@@ -38,7 +40,7 @@ public class PlayerController : NetworkBehaviour
     private float m_Speed;
 
     [SyncVar]
-    Vector2 TestValue;
+    Vector3 lastPosition;
 
     void Start()
     {
@@ -101,12 +103,10 @@ public class PlayerController : NetworkBehaviour
         else
             m_Speed = targetSpeed;
 
-        //Vector3 inputDirection = transform.TransformDirection(new Vector3(m_Input.inputValue.x, 0, m_Input.inputValue.y).normalized);
-
         RotatePlayer();
-        TestValue = m_Input.inputValue;
-        AnimatorPlay(m_Speed, TestValue);
-        //m_Controller.Move(inputDirection * m_Speed * Time.deltaTime);
+
+        Vector3 inputDir = transform.TransformDirection(new Vector3(m_Input.inputValue.x, 0, m_Input.inputValue.y)).normalized;
+        PlayerMove(m_Speed, inputDir);
     }
 
 
@@ -125,24 +125,35 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-
     [Command]
-    private void AnimatorPlay(float speed, Vector2 input)
+    private void PlayerMove(float speed, Vector3 input)
     {
-        AnimatorMove(speed, input);
+        Movement(speed, input);
     }
 
     [ClientRpc]
-    private void AnimatorMove(float speed, Vector2 input)
+    private void Movement(float speed, Vector3 input)
     {
-        if (input == Vector2.zero)
-            speed = 0;
-        if (m_Animator == null)
-            return;
-
-        m_Animator.SetFloat("MovePosX", speed * input.x);
-        m_Animator.SetFloat("MovePosZ", speed * input.y);
+        m_Controller.Move(input * speed * Time.deltaTime);
     }
+
+    //[Command]
+    //private void AnimatorPlay(float speed, Vector2 input)
+    //{
+    //    AnimatorMove(speed, input);
+    //}
+
+    //[ClientRpc]
+    //private void AnimatorMove(float speed, Vector2 input)
+    //{
+    //    if (input == Vector2.zero)
+    //        speed = 0;
+    //    if (m_Animator == null)
+    //        return;
+
+    //    m_Animator.SetFloat("MovePosX", speed * input.x);
+    //    m_Animator.SetFloat("MovePosZ", speed * input.y);
+    //}
 
     [Command]
     private void CommandAtk()

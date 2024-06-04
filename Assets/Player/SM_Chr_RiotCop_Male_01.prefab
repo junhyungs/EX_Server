@@ -4509,6 +4509,7 @@ GameObject:
   - component: {fileID: 4920838387891582595}
   - component: {fileID: 1483617656784848007}
   - component: {fileID: 6950778866793480347}
+  - component: {fileID: 9059623568157288427}
   m_Layer: 0
   m_Name: SM_Chr_RiotCop_Male_01
   m_TagString: Untagged
@@ -4629,6 +4630,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e0ef3c038668cd459eeac4a35b57d27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   m_input: {x: 0, y: 0}
   m_sprint: 0
 --- !u!114 &7686098546419160985
@@ -4725,6 +4729,23 @@ MonoBehaviour:
   positionSensitivity: 0.01
   rotationSensitivity: 0.01
   scaleSensitivity: 0.01
+--- !u!114 &9059623568157288427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6386975739402487481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f6f3bf89aa97405989c802ba270f815, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 1
+  syncMode: 0
+  syncInterval: 0.1
+  clientAuthority: 1
+  animator: {fileID: 6482503607117504419}
 --- !u!1 &6386992296985548765
 GameObject:
   m_ObjectHideFlags: 0
