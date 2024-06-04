@@ -5,6 +5,7 @@ using UnityEngine;
 using Mirror;
 
 
+
 public class PlayerController : NetworkBehaviour
 {
     [Header("Speed")]
@@ -32,26 +33,32 @@ public class PlayerController : NetworkBehaviour
 
     private CharacterController m_Controller;
     private PlayerInput m_Input;
-    //private NetworkAnimator m_Animator;
+    private NetworkTransformUnreliable m_NetTransUn;
 
     [SyncVar]
     private float targetSpeed;
     [SyncVar]
     private float m_Speed;
 
-    [SyncVar]
-    Vector3 lastPosition;
 
     void Start()
     {
         m_Controller = GetComponent<CharacterController>();
         m_Input = GetComponent<PlayerInput>();
+        m_NetTransUn = GetComponent<NetworkTransformUnreliable>();
+
+        m_NetTransUn.syncInterval = 0.1f;
     }
-    
-    void Update()
+
+    //private void FixedUpdate()
+    //{
+        
+    //}
+
+    private void Update()
     {
         string netTypeStr = isClient ? "Client(O)" : "Client(X)";
-        TextMesh_NetType.text = this.isLocalPlayer ? $"[로컬/{netTypeStr}]" 
+        TextMesh_NetType.text = this.isLocalPlayer ? $"[로컬/{netTypeStr}]"
             : $"[로컬아님/{netTypeStr}]{this.netId}";
 
         SetHPBarOnUpdate(m_Health);
@@ -68,6 +75,7 @@ public class PlayerController : NetworkBehaviour
 
         Move();
     }
+
     private void SetHPBarOnUpdate(int health)
     {
         TextMesh_HealthBar.text = new string('-', health);
@@ -104,9 +112,10 @@ public class PlayerController : NetworkBehaviour
             m_Speed = targetSpeed;
 
         RotatePlayer();
+        AnimatorPlay(m_Speed,m_Input.inputValue);
 
-        Vector3 inputDir = transform.TransformDirection(new Vector3(m_Input.inputValue.x, 0, m_Input.inputValue.y)).normalized;
-        PlayerMove(m_Speed, inputDir);
+        //Vector3 inputDir = transform.TransformDirection(new Vector3(m_Input.inputValue.x, 0, m_Input.inputValue.y)).normalized;
+        //PlayerMove(m_Speed, inputDir);
     }
 
 
@@ -125,35 +134,31 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    [Command]
-    private void PlayerMove(float speed, Vector3 input)
-    {
-        Movement(speed, input);
-    }
-
-    [ClientRpc]
-    private void Movement(float speed, Vector3 input)
-    {
-        m_Controller.Move(input * speed * Time.deltaTime);
-    }
 
     //[Command]
-    //private void AnimatorPlay(float speed, Vector2 input)
+    //private void PlayerMove(float speed, Vector3 input)
     //{
-    //    AnimatorMove(speed, input);
+    //    Movement(speed, input);
     //}
 
     //[ClientRpc]
-    //private void AnimatorMove(float speed, Vector2 input)
+    //private void Movement(float speed, Vector3 input)
     //{
-    //    if (input == Vector2.zero)
-    //        speed = 0;
-    //    if (m_Animator == null)
-    //        return;
-
-    //    m_Animator.SetFloat("MovePosX", speed * input.x);
-    //    m_Animator.SetFloat("MovePosZ", speed * input.y);
+    //    m_Controller.Move(input * speed * Time.deltaTime);
     //}
+
+    [Command]
+    private void AnimatorPlay(float speed, Vector2 input)
+    {
+        AnimatorMove(speed, input);
+    }
+
+    [ClientRpc]
+    private void AnimatorMove(float speed, Vector2 input)
+    {
+        m_Animator.SetFloat("MovePosX", speed * input.x);
+        m_Animator.SetFloat("MovePosZ", speed * input.y);
+    }
 
     [Command]
     private void CommandAtk()
