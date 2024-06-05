@@ -4,52 +4,49 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class PlayerController : NetworkBehaviour
+
+
+public class PlayerController : Singleton<PlayerController>
 {
     [Header("Speed")]
     [SerializeField] private float WalkSpeed;
+
     [Header("SprintSpeed")]
     [SerializeField] private float SprintSpeed;
+
     [Header("ChangeSpeed")]
     [SerializeField] private float ChangeSpeed;
 
-    [Header("HealthBar")]
-    public TextMesh TextMesh_HealthBar;
     [Header("NetType")]
     public TextMesh TextMesh_NetType;
 
     [Header("Attack")]
     public GameObject m_prefab_AtkObject;
     public Transform m_Transform_AtkSpawnPos;
-
-    [Header("Stats Server")]
-    [SyncVar] public int m_Health = 4;
-    //이 변수가 네트워크를 통해 동기화 되어야 함을 나타낸다. 이 변수 값이
-    //변경되면 네트워크를 통해 클라간에 동기화된다.
+    
     [Header("PlayerAnimator")]
     public Animator m_Animator;
 
-
     private CharacterController m_Controller;
     private PlayerInput m_Input;
-    
+    public ParticleSystem m_Prefab;
+
+    [SyncVar]
     private float targetSpeed;
+    [SyncVar]
     private float m_Speed;
+    
 
     void Start()
     {
         m_Controller = GetComponent<CharacterController>();
         m_Input = GetComponent<PlayerInput>();
     }
-    
-    void Update()
+
+    private void Update()
     {
-        string netTypeStr = isClient ? "Client(O)" : "Client(X)";
-        TextMesh_NetType.text = this.isLocalPlayer ? $"[로컬/{netTypeStr}]" 
-            : $"[로컬아님/{netTypeStr}]{this.netId}";
-
-        SetHPBarOnUpdate(m_Health);
-
+        //창(게임 씬)이 선택되어있지 않다면 아래 메소드를 실행하지 않겠다.
+        //이 조건문을 기준으로 항상 실행해야하는 메소드와 창이 선택(플레이)중에만 실행해야하는 메소드를 나눌 수 있는듯.
         if (CheckIsFocusedOnUpdate() == false)
         {
             return;
@@ -62,14 +59,22 @@ public class PlayerController : NetworkBehaviour
 
         Move();
     }
-    private void SetHPBarOnUpdate(int health)
-    {
-        TextMesh_HealthBar.text = new string('-', health);
-    }
-
     private bool CheckIsFocusedOnUpdate()
     {
         return Application.isFocused;
+    }
+
+    private float Sprint()
+    {
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            return SprintSpeed;
+        }
+        else
+        {
+            return WalkSpeed;
+        }
+            
     }
     
     private void Move()
@@ -77,9 +82,7 @@ public class PlayerController : NetworkBehaviour
         if (this.isLocalPlayer == false)
             return;
 
-
-
-        targetSpeed = m_Input.sprint ? SprintSpeed : WalkSpeed;
+        targetSpeed = Sprint();
         
         if (m_Input.inputValue == Vector2.zero)
         {
@@ -99,12 +102,10 @@ public class PlayerController : NetworkBehaviour
         else
             m_Speed = targetSpeed;
 
-        Vector3 inputDirection = transform.TransformDirection(new Vector3(m_Input.inputValue.x, 0, m_Input.inputValue.y).normalized);
         RotatePlayer();
-        AnimatorPlay(m_Speed, m_Input.inputValue);
-        
-        m_Controller.Move(inputDirection * m_Speed * Time.deltaTime);
+        AnimatorPlay(m_Speed,m_Input.inputValue);
     }
+
 
     private void RotatePlayer()
     {
@@ -121,13 +122,15 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    [Command]
     private void AnimatorPlay(float speed, Vector2 input)
     {
-        if (input == Vector2.zero)
-            speed = 0;
-        if (m_Animator == null)
-            return;
+        AnimatorMove(speed, input);
+    }
 
+    [ClientRpc]
+    private void AnimatorMove(float speed, Vector2 input)
+    {
         m_Animator.SetFloat("MovePosX", speed * input.x);
         m_Animator.SetFloat("MovePosZ", speed * input.y);
     }
@@ -135,7 +138,8 @@ public class PlayerController : NetworkBehaviour
     [Command]
     private void CommandAtk()
     {
-        GameObject attackObjectForSpawn = Instantiate(m_prefab_AtkObject, m_Transform_AtkSpawnPos.position, Quaternion.identity);
+        GameObject attackObjectForSpawn = PoolManager.Instance.GetBullet();
+        attackObjectForSpawn.transform.position = m_Transform_AtkSpawnPos.position;
         attackObjectForSpawn.transform.rotation = transform.rotation;
         NetworkServer.Spawn(attackObjectForSpawn);
 
@@ -145,22 +149,12 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     private void RpcOnAttack()
     {
-        Debug.Log($"{this.netId}가 RPC호출함");
+        m_Animator.SetTrigger("Fire");
+
+        if (m_Prefab != null)
+            m_Prefab.Play();
+        
         //Fire 애니메이션
-    }
-
-    [ServerCallback]
-    private void OnTriggerEnter(Collider other)
-    {
-        var AtkGenObject = other.GetComponent<AttackSpawnObject>();
-
-        if (AtkGenObject == null)
-            return;
-
-        m_Health--;
-
-        if (m_Health <= 0)
-            NetworkServer.Destroy(this.gameObject);
     }
 
 }
