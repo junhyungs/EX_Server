@@ -16,15 +16,11 @@ public class PoolManager : Singleton<PoolManager>
 
     public override void OnStartServer()
     {
-        BulletPool = new Queue<GameObject>[Bullet.Length];
         ZombiePool = new Queue<GameObject>[Zombie.Length];
+        BulletPool = new Queue<GameObject>[Bullet.Length];
+
         InitPool();
     }
-    void Start()
-    {
-        
-    }
-
     
     private void InitPool()
     {
@@ -74,16 +70,17 @@ public class PoolManager : Singleton<PoolManager>
         }
     }
 
-
     public GameObject GetBullet()
     {
         GameObject bullet = BulletPool[0].Dequeue();
-        bullet.transform.rotation = Quaternion.identity;
         BulletPool[0].Enqueue(bullet);
+        Rigidbody bulletRigid = bullet.GetComponent<Rigidbody>();
+        bulletRigid.velocity = Vector3.zero;
+        bullet.transform.rotation = Quaternion.identity;    
         bullet.SetActive(true);
         return bullet;  
     }
-   
+
     public GameObject GetZombie()
     {
         int PoolNumber = Random.Range(0, 4);
@@ -93,4 +90,5 @@ public class PoolManager : Singleton<PoolManager>
         zombie.SetActive(true);
         return zombie; 
     }
+
 }

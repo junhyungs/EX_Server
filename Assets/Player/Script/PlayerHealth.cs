@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerHealth : NetworkBehaviour
+public class PlayerHealth : NetworkBehaviour, IDamage
 {
     [Header("HealthBar")]
     public TextMesh TextMesh_HealthBar;
@@ -43,5 +43,10 @@ public class PlayerHealth : NetworkBehaviour
 
         if (PlayerHp <= 0)
             NetworkServer.Destroy(this.gameObject);
+    }
+
+    public void TakeDamage(float damage)
+    {
+        
     }
 }

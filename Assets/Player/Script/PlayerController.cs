@@ -29,12 +29,13 @@ public class PlayerController : Singleton<PlayerController>
 
     private CharacterController m_Controller;
     private PlayerInput m_Input;
+    public ParticleSystem m_Prefab;
 
     [SyncVar]
     private float targetSpeed;
     [SyncVar]
     private float m_Speed;
-
+    
 
     void Start()
     {
@@ -51,7 +52,7 @@ public class PlayerController : Singleton<PlayerController>
             return;
         }
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButtonDown(0))
         {
             CommandAtk();
         }
@@ -62,13 +63,26 @@ public class PlayerController : Singleton<PlayerController>
     {
         return Application.isFocused;
     }
+
+    private float Sprint()
+    {
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            return SprintSpeed;
+        }
+        else
+        {
+            return WalkSpeed;
+        }
+            
+    }
     
     private void Move()
     {
         if (this.isLocalPlayer == false)
             return;
 
-        targetSpeed = m_Input.sprint ? SprintSpeed : WalkSpeed;
+        targetSpeed = Sprint();
         
         if (m_Input.inputValue == Vector2.zero)
         {
@@ -90,8 +104,6 @@ public class PlayerController : Singleton<PlayerController>
 
         RotatePlayer();
         AnimatorPlay(m_Speed,m_Input.inputValue);
-        //Vector3 inputDir = transform.TransformDirection(new Vector3(m_Input.inputValue.x, 0, m_Input.inputValue.y)).normalized;
-        //PlayerMove(m_Speed, inputDir);
     }
 
 
@@ -109,18 +121,6 @@ public class PlayerController : Singleton<PlayerController>
 
         }
     }
-
-    //[Command]
-    //private void PlayerMove(float speed, Vector3 input)
-    //{
-    //    Movement(speed, input);
-    //}
-
-    //[ClientRpc]
-    //private void Movement(float speed, Vector3 input)
-    //{
-    //    m_Controller.Move(input * speed * Time.deltaTime);
-    //}
 
     [Command]
     private void AnimatorPlay(float speed, Vector2 input)
@@ -150,6 +150,9 @@ public class PlayerController : Singleton<PlayerController>
     private void RpcOnAttack()
     {
         m_Animator.SetTrigger("Fire");
+
+        if (m_Prefab != null)
+            m_Prefab.Play();
         
         //Fire 애니메이션
     }
