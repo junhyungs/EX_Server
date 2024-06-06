@@ -7,8 +7,12 @@ using Mirror;
 public class AttackSpawnObject : NetworkBehaviour
 {
     private float m_ActiveTime = 5.0f;
-    private float m_ForcePower = 100f;
-    private float m_BulletDamage = 1.0f;
+    private float m_ForcePower;
+    private float m_BulletDamage;
+
+    private bool m_Explosion;
+    private float m_ExplosionRadius = 3.0f;
+    private float m_ExplosionDamage = 2.0f;
     private Rigidbody m_Rigid;
 
     private void Start()
@@ -19,55 +23,80 @@ public class AttackSpawnObject : NetworkBehaviour
 
     private void OnEnable()
     {
-        Invoke(nameof(ReturnObject), m_ActiveTime);
+        if(isServer)
+            Invoke(nameof(ReturnObject), m_ActiveTime);
+
     }
 
-    public void InitBullet(float damage, float forcePower)
+    public void SetBullet(float damage, float forcePower, bool Explosion )
     {
         m_ForcePower = forcePower;
         m_BulletDamage = damage;
+        m_Explosion = Explosion;
     }
 
     private void FixedUpdate()
     {
-        if (isServer)
-        {
-            OnBulletMoveUpdate(m_ForcePower);
-        }
+        OnBulletMoveUpdate(m_ForcePower);
     }
 
-    [Server]
+    
     private void OnBulletMoveUpdate(float force)
     {
         BulletMove(force);
     }
 
-    [ClientRpc]
+    
     private void BulletMove(float force)
     {
         Vector3 Move = transform.forward * force;
         m_Rigid.AddForce(Move);
     }
 
-
-    [Server]
+    [Command]
     private void ReturnObject()
     {
         DisableObject();
     }
 
-    [ClientRpc]
+    
     private void DisableObject()
     {
+        NetworkServer.UnSpawn(this.gameObject);
         this.gameObject.SetActive(false);
+        //PoolManager.Instance.RetuenBullet(this.gameObject);
     }
 
-    //[ServerCallback]
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    if(other.gameObject.layer == LayerMask.NameToLayer("Zombie"))
-    //        DestroySelf();
-    //}
+
+    [ServerCallback]
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
+        {
+            IDamage damage = other.GetComponent<IDamage>();
+
+            if(damage != null)
+            {
+                if (m_Explosion)
+                {
+                    Collider[] hitColl = Physics.OverlapSphere(other.transform.position, m_ExplosionRadius, LayerMask.GetMask("Zombie"));
+
+                    for(int i = 0; i < hitColl.Length; i++)
+                    {
+                        IDamage hit = hitColl[i].GetComponent<IDamage>();
+                        hit.TakeDamage(m_ExplosionDamage);
+                    }
+
+                    DisableObject();
+                }
+                else
+                {
+                    damage.TakeDamage(m_BulletDamage);
+                    DisableObject();
+                }
+            }
+        }
+    }
 
 
 }

@@ -6,7 +6,7 @@ using Mirror;
 
 
 
-public class PlayerController : Singleton<PlayerController>
+public class PlayerController : NetworkBehaviour
 {
     [Header("Speed")]
     [SerializeField] private float WalkSpeed;
@@ -27,9 +27,15 @@ public class PlayerController : Singleton<PlayerController>
     [Header("PlayerAnimator")]
     public Animator m_Animator;
 
+    [Header("Particle")]
+    public ParticleSystem m_Prefab;
+
+    [Header("ItemSO")]
+    public ItemSO[] m_itemSo;
+
     private CharacterController m_Controller;
     private PlayerInput m_Input;
-    public ParticleSystem m_Prefab;
+    
 
     [SyncVar]
     private float targetSpeed;
@@ -142,7 +148,6 @@ public class PlayerController : Singleton<PlayerController>
         attackObjectForSpawn.transform.position = m_Transform_AtkSpawnPos.position;
         attackObjectForSpawn.transform.rotation = transform.rotation;
         NetworkServer.Spawn(attackObjectForSpawn);
-
         RpcOnAttack();
     }
 
@@ -155,6 +160,23 @@ public class PlayerController : Singleton<PlayerController>
             m_Prefab.Play();
         
         //Fire 애니메이션
+    }
+
+    [ServerCallback]
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.layer == LayerMask.NameToLayer("Item"))
+        {
+            Item item = other.gameObject.GetComponent<Item>();
+
+            for(int i = 0; i < m_itemSo.Length; i++)
+            {
+                if (m_itemSo[i].name == item.m_ItemName)
+                {
+                    m_itemSo[i].UseItem();
+                }
+            }
+        }
     }
 
 }

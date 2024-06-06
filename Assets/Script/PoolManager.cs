@@ -14,41 +14,70 @@ public class PoolManager : Singleton<PoolManager>
     private Queue<GameObject>[] BulletPool;
     private Queue<GameObject>[] ZombiePool;
 
+    private float BulletDamage = 1f;
+    private float BulletForcePower = 100f;
+    private bool Explosion = false;
+
+    public bool IsExplosion
+    {
+        get { return Explosion; }
+        set { Explosion = value; }
+    }
+
+    public override void OnStartClient()
+    {
+        InitBulletPool();
+    }
+
     public override void OnStartServer()
     {
-        ZombiePool = new Queue<GameObject>[Zombie.Length];
-        BulletPool = new Queue<GameObject>[Bullet.Length];
-
-        InitPool();
+        InitZombiePool();
     }
-    
-    private void InitPool()
-    {
-        for(int i = 0; i < Bullet.Length; i++)
-        {
-            BulletPool[i] = new Queue<GameObject>();
-        }
 
-        for(int i = 0; i < Zombie.Length; i++)
+    private void InitZombiePool()
+    {
+        ZombiePool = new Queue<GameObject>[Zombie.Length];
+
+        for (int i = 0; i < Zombie.Length; i++)
         {
             ZombiePool[i] = new Queue<GameObject>();
         }
 
-        for(int i = 0; i < 200; i++)
+        CreateZombie();
+    }
+    private void InitBulletPool()
+    {
+        BulletPool = new Queue<GameObject>[Bullet.Length];
+
+        for (int i = 0; i < Bullet.Length; i++)
+        {
+            BulletPool[i] = new Queue<GameObject>();
+        }
+
+        CreateBullet();
+    }
+   
+    private void CreateBullet()
+    {
+        for (int i = 0; i < 200; i++)
         {
             GameObject bulletPrefab = Instantiate(Bullet[0], BulletSpawnTransform[0]);
             bulletPrefab.SetActive(false);
             BulletPool[0].Enqueue(bulletPrefab);
         }
+    }
 
-        for(int i = 0; i < 50; i++)
+    [Server]
+    private void CreateZombie()
+    {
+        for (int i = 0; i < 50; i++)
         {
             GameObject zombiePrefab = Instantiate(Zombie[0], ZombieSpawnTransform[0]);
             zombiePrefab.SetActive(false);
             ZombiePool[0].Enqueue(zombiePrefab);
         }
 
-        for(int i = 0; i < 50; i++)
+        for (int i = 0; i < 50; i++)
         {
             GameObject zombiePrefab = Instantiate(Zombie[1], ZombieSpawnTransform[1]);
             zombiePrefab.SetActive(false);
@@ -69,26 +98,60 @@ public class PoolManager : Singleton<PoolManager>
             ZombiePool[3].Enqueue(zombiePrefab);
         }
     }
-
+      
     public GameObject GetBullet()
     {
         GameObject bullet = BulletPool[0].Dequeue();
         BulletPool[0].Enqueue(bullet);
-        Rigidbody bulletRigid = bullet.GetComponent<Rigidbody>();
-        bulletRigid.velocity = Vector3.zero;
-        bullet.transform.rotation = Quaternion.identity;    
-        bullet.SetActive(true);
+        InitBullet(bullet);
+        bullet.SetActive(true);        
         return bullet;  
     }
 
+    [Server]
     public GameObject GetZombie()
     {
         int PoolNumber = Random.Range(0, 4);
 
-        GameObject zombie = ZombiePool[PoolNumber].Dequeue();
-        ZombiePool[PoolNumber].Enqueue(zombie);
+        GameObject zombie = ZombiePool[PoolNumber].Dequeue();   
+        //여기도 풀넘버 보내주는 메소드 작성해야함
         zombie.SetActive(true);
+        NetworkServer.Spawn(zombie);
         return zombie; 
     }
 
+   
+    //public void RetuenBullet(GameObject bullet)
+    //{
+    //    bullet.SetActive(false);
+    //    NetworkServer.UnSpawn(bullet);
+    //    BulletPool[0].Enqueue(bullet);
+    //}
+
+    //public void ReturnZombie(GameObject zombie)
+    //{
+    //    int ZombieNumber = zombie.; 나중에 좀비 스크립트안에 풀 넘버 먹이는 메소드 추가할 예정;
+
+    //    zombie.SetActive(false);
+    //    NetworkServer.UnSpawn(zombie);
+    //    ZombiePool[ZombieNumber].Enqueue(zombie);
+    //}
+
+    private void InitBullet(GameObject bullet)
+    {
+        Rigidbody bulletRd = bullet.GetComponent<Rigidbody>();
+        bulletRd.velocity = Vector3.zero;
+        bullet.transform.rotation = Quaternion.identity;    
+        AttackSpawnObject AtkObject = bulletRd.GetComponent<AttackSpawnObject>();
+        AtkObject.SetBullet(BulletDamage, BulletForcePower, Explosion);
+    }
+
+    
+
+    private void InitZombie(GameObject zombie)
+    {
+
+    }
+
+    
 }

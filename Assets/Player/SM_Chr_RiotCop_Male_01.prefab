@@ -4658,6 +4658,9 @@ MonoBehaviour:
   m_Transform_AtkSpawnPos: {fileID: 448798687295210308}
   m_Animator: {fileID: 6482503607117504419}
   m_Prefab: {fileID: 7679313789491052734}
+  m_itemSo:
+  - {fileID: 11400000, guid: 581fe8622233faa4ca33341658a2b937, type: 2}
+  - {fileID: 11400000, guid: e38df9eb07737f8499c7f9aae5752e4c, type: 2}
 --- !u!114 &1483617656784848007
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6970,6 +6973,22 @@ PrefabInstance:
     - target: {fileID: 4023067158591890, guid: ad49a19d2c4adc94b838606a5d459f85, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6261482984436730954, guid: ad49a19d2c4adc94b838606a5d459f85, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6261542159427095260, guid: ad49a19d2c4adc94b838606a5d459f85, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6261985963725680690, guid: ad49a19d2c4adc94b838606a5d459f85, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6262213967795161314, guid: ad49a19d2c4adc94b838606a5d459f85, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ad49a19d2c4adc94b838606a5d459f85, type: 3}

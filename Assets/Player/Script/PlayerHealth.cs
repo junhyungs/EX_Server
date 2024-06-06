@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerHealth : NetworkBehaviour, IDamage
+public class PlayerHealth : Singleton<PlayerHealth>, IDamage
 {
     [Header("HealthBar")]
     public TextMesh TextMesh_HealthBar;
@@ -15,6 +15,12 @@ public class PlayerHealth : NetworkBehaviour, IDamage
     [SerializeField]
     [SyncVar]
     private int PlayerHp = 4;
+
+    public int HP
+    {
+        get { return PlayerHp; }
+        set { PlayerHp = value; }
+    }
 
     void Update()
     {
@@ -29,24 +35,25 @@ public class PlayerHealth : NetworkBehaviour, IDamage
         TextMesh_HealthBar.text = new string('-', health);
     }
 
+    //[ServerCallback]
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    var AtkGenObject = other.GetComponent<AttackSpawnObject>();
+
+    //    if (AtkGenObject == null)
+    //    {
+    //        return;
+    //    }
+
+    //    PlayerHp--;
+
+    //    if (PlayerHp <= 0)
+    //        NetworkServer.Destroy(this.gameObject);
+    //}
+
     [ServerCallback]
-    private void OnTriggerEnter(Collider other)
-    {
-        var AtkGenObject = other.GetComponent<AttackSpawnObject>();
-
-        if (AtkGenObject == null)
-        {
-            return;
-        }
-
-        PlayerHp--;
-
-        if (PlayerHp <= 0)
-            NetworkServer.Destroy(this.gameObject);
-    }
-
     public void TakeDamage(float damage)
     {
-        
+        Debug.Log("¸ÂÀ½");
     }
 }
