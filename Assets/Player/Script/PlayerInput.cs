@@ -16,7 +16,7 @@ public class PlayerInput : NetworkBehaviour
     {
         get { return m_input; }
     }
-    
+
     private void OnMove(InputValue inputValue)
     {
         SetMove(inputValue.Get<Vector2>());

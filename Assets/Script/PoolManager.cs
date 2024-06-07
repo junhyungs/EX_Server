@@ -26,11 +26,13 @@ public class PoolManager : Singleton<PoolManager>
 
     public override void OnStartClient()
     {
+        Debug.Log("클라시작");
         InitBulletPool();
     }
 
     public override void OnStartServer()
     {
+        Debug.Log("서버시작");
         InitZombiePool();
     }
 
@@ -45,6 +47,7 @@ public class PoolManager : Singleton<PoolManager>
 
         CreateZombie();
     }
+
     private void InitBulletPool()
     {
         BulletPool = new Queue<GameObject>[Bullet.Length];
@@ -67,7 +70,7 @@ public class PoolManager : Singleton<PoolManager>
         }
     }
 
-    [Server]
+   
     private void CreateZombie()
     {
         for (int i = 0; i < 50; i++)
@@ -99,16 +102,16 @@ public class PoolManager : Singleton<PoolManager>
         }
     }
       
-    public GameObject GetBullet()
-    {
-        GameObject bullet = BulletPool[0].Dequeue();
-        BulletPool[0].Enqueue(bullet);
-        InitBullet(bullet);
-        bullet.SetActive(true);        
-        return bullet;  
-    }
+    //public GameObject GetBullet()
+    //{
+    //    GameObject bullet = BulletPool[0].Dequeue();
+    //    BulletPool[0].Enqueue(bullet);
+    //    InitBullet(bullet);
+    //    bullet.SetActive(true);        
+    //    return bullet;  
+    //}
 
-    [Server]
+  
     public GameObject GetZombie()
     {
         int PoolNumber = Random.Range(0, 4);
@@ -120,13 +123,14 @@ public class PoolManager : Singleton<PoolManager>
         return zombie; 
     }
 
-   
-    //public void RetuenBullet(GameObject bullet)
-    //{
-    //    bullet.SetActive(false);
-    //    NetworkServer.UnSpawn(bullet);
-    //    BulletPool[0].Enqueue(bullet);
-    //}
+
+    public void RetuenBullet(GameObject bullet)
+    {
+        Debug.Log("ReturnBullet");
+        bullet.SetActive(false);
+        NetworkServer.UnSpawn(bullet);
+        BulletPool[0].Enqueue(bullet);
+    }
 
     //public void ReturnZombie(GameObject zombie)
     //{
@@ -137,14 +141,14 @@ public class PoolManager : Singleton<PoolManager>
     //    ZombiePool[ZombieNumber].Enqueue(zombie);
     //}
 
-    private void InitBullet(GameObject bullet)
-    {
-        Rigidbody bulletRd = bullet.GetComponent<Rigidbody>();
-        bulletRd.velocity = Vector3.zero;
-        bullet.transform.rotation = Quaternion.identity;    
-        AttackSpawnObject AtkObject = bulletRd.GetComponent<AttackSpawnObject>();
-        AtkObject.SetBullet(BulletDamage, BulletForcePower, Explosion);
-    }
+    //private void InitBullet(GameObject bullet)
+    //{
+    //    Rigidbody bulletRd = bullet.GetComponent<Rigidbody>();
+    //    bulletRd.velocity = Vector3.zero;
+    //    bullet.transform.rotation = Quaternion.identity;    
+    //    AttackSpawnObject AtkObject = bulletRd.GetComponent<AttackSpawnObject>();
+    //    AtkObject.SetBullet(BulletDamage, BulletForcePower, Explosion);
+    //}
 
     
 

@@ -41,6 +41,16 @@ public class PlayerController : NetworkBehaviour
     private float targetSpeed;
     [SyncVar]
     private float m_Speed;
+    [SyncVar]
+    private float m_BulletCount = 20;
+    [SyncVar]
+    private bool OnFire = true;
+
+    public void Fire()
+    {
+        m_BulletCount = 20;
+        OnFire = true;
+    }
     
 
     void Start()
@@ -61,6 +71,11 @@ public class PlayerController : NetworkBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             CommandAtk();
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            CommandReloading();
         }
 
         Move();
@@ -129,6 +144,18 @@ public class PlayerController : NetworkBehaviour
     }
 
     [Command]
+    private void CommandReloading()
+    {
+        ReloadAnimation();
+    }
+
+    [ClientRpc]
+    private void ReloadAnimation()
+    {
+        m_Animator.SetTrigger("Reloading");
+    }
+
+    [Command]
     private void AnimatorPlay(float speed, Vector2 input)
     {
         AnimatorMove(speed, input);
@@ -144,11 +171,21 @@ public class PlayerController : NetworkBehaviour
     [Command]
     private void CommandAtk()
     {
-        GameObject attackObjectForSpawn = PoolManager.Instance.GetBullet();
-        attackObjectForSpawn.transform.position = m_Transform_AtkSpawnPos.position;
-        attackObjectForSpawn.transform.rotation = transform.rotation;
-        NetworkServer.Spawn(attackObjectForSpawn);
-        RpcOnAttack();
+        if (OnFire)
+        {
+            m_BulletCount--;
+
+            if(m_BulletCount == 0)
+            {
+                OnFire = false;
+            }
+            
+            GameObject bullet = Instantiate(m_prefab_AtkObject, m_Transform_AtkSpawnPos.position, m_Transform_AtkSpawnPos.rotation);
+            AttackSpawnObject bulletobj = bullet.GetComponent<AttackSpawnObject>();
+            bulletobj.SetBullet(1f, false);
+            NetworkServer.Spawn(bullet);
+            RpcOnAttack();
+        }
     }
 
     [ClientRpc]

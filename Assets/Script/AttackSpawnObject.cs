@@ -2,69 +2,40 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using Unity.VisualScripting;
 
 
 public class AttackSpawnObject : NetworkBehaviour
 {
     private float m_ActiveTime = 5.0f;
-    private float m_ForcePower;
+    private float m_ForcePower = 2000f;
     private float m_BulletDamage;
 
     private bool m_Explosion;
     private float m_ExplosionRadius = 3.0f;
     private float m_ExplosionDamage = 2.0f;
-    private Rigidbody m_Rigid;
+    public Rigidbody m_Rigid;
 
     private void Start()
-    {
-        m_Rigid = GetComponent<Rigidbody>();
-        m_Rigid.useGravity = false;
+    {   
+        m_Rigid.AddForce(transform.forward * m_ForcePower);
     }
 
-    private void OnEnable()
+    public override void OnStartServer()
     {
-        if(isServer)
-            Invoke(nameof(ReturnObject), m_ActiveTime);
-
+        Invoke(nameof(DisableObject), m_ActiveTime);
     }
 
-    public void SetBullet(float damage, float forcePower, bool Explosion )
+    public void SetBullet(float damage, bool Explosion )
     {
-        m_ForcePower = forcePower;
         m_BulletDamage = damage;
         m_Explosion = Explosion;
     }
 
-    private void FixedUpdate()
-    {
-        OnBulletMoveUpdate(m_ForcePower);
-    }
-
-    
-    private void OnBulletMoveUpdate(float force)
-    {
-        BulletMove(force);
-    }
-
-    
-    private void BulletMove(float force)
-    {
-        Vector3 Move = transform.forward * force;
-        m_Rigid.AddForce(Move);
-    }
-
-    [Command]
-    private void ReturnObject()
-    {
-        DisableObject();
-    }
-
-    
+    [Server]
     private void DisableObject()
     {
-        NetworkServer.UnSpawn(this.gameObject);
-        this.gameObject.SetActive(false);
-        //PoolManager.Instance.RetuenBullet(this.gameObject);
+        NetworkServer.Destroy(this.gameObject);
     }
 
 
