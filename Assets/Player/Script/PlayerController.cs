@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using Cinemachine;
 
 
 
@@ -29,9 +30,14 @@ public class PlayerController : NetworkBehaviour
 
     [Header("Particle")]
     public ParticleSystem m_Prefab;
+    public ParticleSystem m_BulletShells;
 
     [Header("ItemSO")]
     public ItemSO[] m_itemSo;
+
+    [Header("PlayerCam")]
+    public GameObject VirtualCameraPrefab;
+
 
     private CharacterController m_Controller;
     private PlayerInput m_Input;
@@ -46,7 +52,9 @@ public class PlayerController : NetworkBehaviour
     [SyncVar]
     private bool OnFire = true;
 
-    public void Fire()
+
+    [Command]
+    public void Reload()
     {
         m_BulletCount = 20;
         OnFire = true;
@@ -58,6 +66,38 @@ public class PlayerController : NetworkBehaviour
         m_Controller = GetComponent<CharacterController>();
         m_Input = GetComponent<PlayerInput>();
     }
+
+    public override void OnStartLocalPlayer()
+    {
+        base.OnStartLocalPlayer();
+
+        if (isLocalPlayer)
+        {
+            GameObject Cam = Instantiate(VirtualCameraPrefab);
+
+            Cam.transform.rotation = Quaternion.Euler(50f, 90f, 0);
+
+            CinemachineVirtualCamera virtualcam = Cam.GetComponent<CinemachineVirtualCamera>();
+
+            virtualcam.Follow = transform;
+
+            var doNothing = virtualcam.GetCinemachineComponent<CinemachineComposer>();
+
+            if(doNothing != null)
+            {
+                Destroy(doNothing);
+            }
+
+            var transPoser = virtualcam.GetCinemachineComponent<CinemachineTransposer>();
+            if(transPoser != null)
+            {
+                transPoser.m_BindingMode = CinemachineTransposer.BindingMode.WorldSpace;
+                transPoser.m_FollowOffset = new Vector3(-8f, 10f, 0);
+            }
+           
+        }
+    }
+
 
     private void Update()
     {
@@ -130,9 +170,10 @@ public class PlayerController : NetworkBehaviour
 
     private void RotatePlayer()
     {
+        
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        if(Physics.Raycast(ray, out RaycastHit hit, 100))
+        if (Physics.Raycast(ray, out RaycastHit hit, 100))
         {
             Vector3 lookRotate = new Vector3(hit.point.x, transform.position.y, hit.point.z);
 
@@ -179,7 +220,7 @@ public class PlayerController : NetworkBehaviour
             {
                 OnFire = false;
             }
-            
+
             GameObject bullet = Instantiate(m_prefab_AtkObject, m_Transform_AtkSpawnPos.position, m_Transform_AtkSpawnPos.rotation);
             AttackSpawnObject bulletobj = bullet.GetComponent<AttackSpawnObject>();
             bulletobj.SetBullet(1f, false);
@@ -194,7 +235,11 @@ public class PlayerController : NetworkBehaviour
         m_Animator.SetTrigger("Fire");
 
         if (m_Prefab != null)
+        {
             m_Prefab.Play();
+            m_BulletShells.Play();
+        }
+            
         
         //Fire 애니메이션
     }

@@ -1,3 +1,4 @@
+using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,14 +6,52 @@ using UnityEngine;
 public class SpawnManager : Singleton<SpawnManager>
 {
     public Transform[] ZombieSpawnPoint;
-    private Transform PlayerTransform;
+    public GameObject[] ZombieObject;
+    public Transform TestTrans;
 
-    void Start()
+    public float SpawnTimer = 5.0f;
+    public float SpawnSpeed = 1f;
+
+    [SyncVar]
+    public int GameLevel = 1;
+    [SyncVar]
+    private float EnemyHp = 1.0f;
+    [SyncVar]
+    private float EnemySpeed = 5.0f;
+    [SyncVar]
+    private float EnemyAtk = 1.0f;
+
+    public override void OnStartServer()
     {
-        
+        StartCoroutine(ZombieSpawn());
     }
 
     
+    private IEnumerator ZombieSpawn()
+    {
+        while (!GameManager.Instance.IsGameOver)
+        {
+            SpawnEnemy();
+            yield return new WaitForSeconds(SpawnTimer);
+        }
+    }
 
+    public void LevelUp(int Up)
+    {
+
+    }
+
+    [Command]
+    public void SpawnEnemy()
+    {
+        int randomZombie = Random.Range(0, 4);
+        int randomPoint = Random.Range(0, 4);
+
+        GameObject zombie = Instantiate(ZombieObject[randomZombie], ZombieSpawnPoint[randomPoint]);
+        Zombie zombieOBject = zombie.GetComponent<Zombie>();
+        zombieOBject.SetZombie(EnemyHp, EnemySpeed, EnemyAtk, TestTrans);
+
+        NetworkServer.Spawn(zombie);
+    }
 
 }
