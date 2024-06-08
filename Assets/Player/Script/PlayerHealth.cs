@@ -35,22 +35,6 @@ public class PlayerHealth : Singleton<PlayerHealth>, IDamage
         TextMesh_HealthBar.text = new string('-', health);
     }
 
-    //[ServerCallback]
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    var AtkGenObject = other.GetComponent<AttackSpawnObject>();
-
-    //    if (AtkGenObject == null)
-    //    {
-    //        return;
-    //    }
-
-    //    PlayerHp--;
-
-    //    if (PlayerHp <= 0)
-    //        NetworkServer.Destroy(this.gameObject);
-    //}
-
     [ServerCallback]
     public void TakeDamage(float damage)
     {

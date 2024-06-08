@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpawnManager : Singleton<SpawnManager>
+public class SpawnManager : NetworkBehaviour
 {
     public Transform[] ZombieSpawnPoint;
     public GameObject[] ZombieObject;
@@ -21,12 +21,12 @@ public class SpawnManager : Singleton<SpawnManager>
     [SyncVar]
     private float EnemyAtk = 1.0f;
 
+
     public override void OnStartServer()
     {
         StartCoroutine(ZombieSpawn());
     }
 
-    
     private IEnumerator ZombieSpawn()
     {
         while (!GameManager.Instance.IsGameOver)
@@ -41,11 +41,16 @@ public class SpawnManager : Singleton<SpawnManager>
 
     }
 
-    [Command]
+    
+    //private void Spawn()
+    //{
+    //    SpawnEnemy();
+    //}
+
     public void SpawnEnemy()
     {
-        int randomZombie = Random.Range(0, 4);
-        int randomPoint = Random.Range(0, 4);
+        int randomZombie = Random.Range(0, ZombieObject.Length);
+        int randomPoint = Random.Range(0, ZombieSpawnPoint.Length);
 
         GameObject zombie = Instantiate(ZombieObject[randomZombie], ZombieSpawnPoint[randomPoint]);
         Zombie zombieOBject = zombie.GetComponent<Zombie>();

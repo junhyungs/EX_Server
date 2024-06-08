@@ -24,15 +24,15 @@ public class ItemSO : ScriptableObject
         }
         else if(m_ItemStat == ItemStat.Explosion)
         {
-            PoolManager.Instance.StartCoroutine(IsExplosion());
+            AttackSpawnObject.Instance.StartCoroutine(IsExplosion());
         }
     }
 
     private IEnumerator IsExplosion()
     {
-        PoolManager.Instance.IsExplosion = true;
+        AttackSpawnObject.Instance.SetBullet(2f, true);
         yield return new WaitForSeconds(5.0f);
-        PoolManager.Instance.IsExplosion = false;
+        AttackSpawnObject.Instance.SetBullet(1f, false);
     }
 
 

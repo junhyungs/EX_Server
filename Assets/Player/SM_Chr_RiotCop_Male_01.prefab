@@ -4511,6 +4511,7 @@ GameObject:
   - component: {fileID: 9059623568157288427}
   - component: {fileID: 8624418729971143037}
   - component: {fileID: 2194936704758514219}
+  - component: {fileID: 2993726728153388761}
   m_Layer: 3
   m_Name: SM_Chr_RiotCop_Male_01
   m_TagString: Untagged
@@ -4766,6 +4767,20 @@ MonoBehaviour:
   syncInterval: 0
   TextMesh_HealthBar: {fileID: 7929993435224684146}
   PlayerHp: 4
+--- !u!136 &2993726728153388761
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6386975739402487481}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.29
+  m_Height: 1.98
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.01, z: 0}
 --- !u!1 &6386992296985548765
 GameObject:
   m_ObjectHideFlags: 0

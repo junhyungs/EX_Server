@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class GameManager : Singleton<GameManager>
+public class GameManager : NetworkManager
 {
+    public static GameManager Instance;
+
     private bool GameOver = false;
     private int Score = 0;
 
@@ -19,6 +21,11 @@ public class GameManager : Singleton<GameManager>
         set { Score = value; }
     }
 
+    public override void Awake()
+    {
+        base.Awake();
 
-    
+        Instance = this;
+    }
+
 }

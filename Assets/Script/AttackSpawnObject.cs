@@ -14,7 +14,14 @@ public class AttackSpawnObject : NetworkBehaviour
     private bool m_Explosion;
     private float m_ExplosionRadius = 3.0f;
     private float m_ExplosionDamage = 2.0f;
+
     public Rigidbody m_Rigid;
+    public static AttackSpawnObject Instance;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Start()
     {   
@@ -42,7 +49,7 @@ public class AttackSpawnObject : NetworkBehaviour
     [ServerCallback]
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
+        if (other.gameObject.layer == LayerMask.NameToLayer("Zombie"))
         {
             IDamage damage = other.GetComponent<IDamage>();
 
