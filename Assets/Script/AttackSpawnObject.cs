@@ -9,14 +9,20 @@ public class AttackSpawnObject : NetworkBehaviour
 {
     private float m_ActiveTime = 5.0f;
     private float m_ForcePower = 2000f;
-    private float m_BulletDamage;
+    private int m_BulletDamage = 1;
 
     private bool m_Explosion;
     private float m_ExplosionRadius = 3.0f;
-    private float m_ExplosionDamage = 2.0f;
+    private int m_ExplosionDamage = 2;
 
     public Rigidbody m_Rigid;
     public static AttackSpawnObject Instance;
+
+    public int BulletDamage
+    {
+        get { return m_BulletDamage; }
+        set { m_BulletDamage = value; }
+    }
 
     private void Awake()
     {
@@ -33,7 +39,7 @@ public class AttackSpawnObject : NetworkBehaviour
         Invoke(nameof(DisableObject), m_ActiveTime);
     }
 
-    public void SetBullet(float damage, bool Explosion )
+    public void SetBullet(int damage, bool Explosion )
     {
         m_BulletDamage = damage;
         m_Explosion = Explosion;
@@ -57,6 +63,8 @@ public class AttackSpawnObject : NetworkBehaviour
             {
                 if (m_Explosion)
                 {
+                    damage.TakeDamage(BulletDamage);
+
                     Collider[] hitColl = Physics.OverlapSphere(other.transform.position, m_ExplosionRadius, LayerMask.GetMask("Zombie"));
 
                     for(int i = 0; i < hitColl.Length; i++)

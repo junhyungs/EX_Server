@@ -94,10 +94,17 @@ public class PlayerController : NetworkBehaviour
                 transPoser.m_BindingMode = CinemachineTransposer.BindingMode.WorldSpace;
                 transPoser.m_FollowOffset = new Vector3(-8f, 10f, 0);
             }
+
+            RegisterLocalPlayer(transform);
            
         }
     }
 
+    [Command]
+    private void RegisterLocalPlayer(Transform transform)
+    {
+        GameManager.Instance.RegisterPlayerTransform(connectionToClient, transform);
+    }
 
     private void Update()
     {
@@ -222,8 +229,6 @@ public class PlayerController : NetworkBehaviour
             }
 
             GameObject bullet = Instantiate(m_prefab_AtkObject, m_Transform_AtkSpawnPos.position, m_Transform_AtkSpawnPos.rotation);
-            AttackSpawnObject bulletobj = bullet.GetComponent<AttackSpawnObject>();
-            bulletobj.SetBullet(1f, false);
             NetworkServer.Spawn(bullet);
             RpcOnAttack();
         }

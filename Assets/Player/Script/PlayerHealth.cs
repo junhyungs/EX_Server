@@ -14,7 +14,7 @@ public class PlayerHealth : Singleton<PlayerHealth>, IDamage
     [Header("PlayerHealth")]
     [SerializeField]
     [SyncVar]
-    private int PlayerHp = 4;
+    private int PlayerHp = 10;
 
     public int HP
     {
@@ -35,9 +35,20 @@ public class PlayerHealth : Singleton<PlayerHealth>, IDamage
         TextMesh_HealthBar.text = new string('-', health);
     }
 
-    [ServerCallback]
-    public void TakeDamage(float damage)
+    [Command]
+    public void UnRegisterLocalPlayer()
     {
-        Debug.Log("¸ÂÀ½");
+        GameManager.Instance.UnRegisterPlayer(connectionToClient);
+    }
+
+    [ServerCallback]
+    public void TakeDamage(int damage)
+    {
+        PlayerHp -= damage;
+
+        if(PlayerHp <= 0)
+        {
+            UnRegisterLocalPlayer();
+        }
     }
 }

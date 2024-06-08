@@ -115,7 +115,7 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1724206212281282897}
-  m_Text: ----
+  m_Text: ----------
   m_OffsetZ: 0
   m_CharacterSize: 0.02
   m_LineSpacing: 1
@@ -4766,7 +4766,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   TextMesh_HealthBar: {fileID: 7929993435224684146}
-  PlayerHp: 4
+  PlayerHp: 10
 --- !u!136 &2993726728153388761
 CapsuleCollider:
   m_ObjectHideFlags: 0

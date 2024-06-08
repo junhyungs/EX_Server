@@ -11,8 +11,8 @@ public class Zombie : NetworkBehaviour, IDamage
     private Transform targetTrans;
     private float ZombieHp;
     private float ZombieSpeed;
-    private float ZombieAtk;
-    private bool Attack = false;
+    private int ZombieAtk;
+    private bool Attack = true;
 
     private void Start()
     {
@@ -20,7 +20,7 @@ public class Zombie : NetworkBehaviour, IDamage
         ZombieAnimator = GetComponent<Animator>();
     }
 
-    public void SetZombie(float zombieHp, float zombieSpeed, float zombieAtk, Transform target)
+    public void SetZombie(float zombieHp, float zombieSpeed, int zombieAtk, Transform target)
     {
         ZombieHp = zombieHp;
         ZombieSpeed = zombieSpeed;
@@ -44,7 +44,7 @@ public class Zombie : NetworkBehaviour, IDamage
 
     private void SetMove(float moveSpeed)
     {
-        if(targetTrans != null)
+        if (targetTrans != null)
         {
             ZombieAgent.speed = moveSpeed;
 
@@ -53,9 +53,11 @@ public class Zombie : NetworkBehaviour, IDamage
             if (Vector3.Distance(transform.position, targetTrans.position) <= ZombieAgent.stoppingDistance)
             {
                 ZombieAgent.SetDestination(transform.position);
-                ZombieAnimator.SetTrigger("Attack");
+                //ZombieAnimator.SetTrigger("Attack");
             }
         }
+        else
+            Debug.Log("ÇöÀç Å¸°ÙÀÌ null");
     }
 
     public void OnAttack()
@@ -80,11 +82,11 @@ public class Zombie : NetworkBehaviour, IDamage
     }
 
     [ServerCallback]
-    public void TakeDamage(float damage)
+    public void TakeDamage(int damage)
     {
-        ZombieHp--;
+        ZombieHp -= damage;
 
-        ZombieAnimator.SetTrigger("Hit");
+        //ZombieAnimator.SetTrigger("Hit");
 
         if(ZombieHp <= 0)
         {
@@ -94,7 +96,8 @@ public class Zombie : NetworkBehaviour, IDamage
 
     public void Die()
     {
-        ZombieAnimator.SetTrigger("Die");
+        //ZombieAnimator.SetTrigger("Die");
+        GameManager.Instance.UnRegisterZombie(this);
         NetworkServer.Destroy(this.gameObject);
     }
 }

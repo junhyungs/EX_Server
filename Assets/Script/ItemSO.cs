@@ -30,9 +30,11 @@ public class ItemSO : ScriptableObject
 
     private IEnumerator IsExplosion()
     {
-        AttackSpawnObject.Instance.SetBullet(2f, true);
+        int ExplosionBulletDamage = AttackSpawnObject.Instance.BulletDamage + 2;
+
+        AttackSpawnObject.Instance.SetBullet(ExplosionBulletDamage, true);
+
         yield return new WaitForSeconds(5.0f);
-        AttackSpawnObject.Instance.SetBullet(1f, false);
     }
 
 
