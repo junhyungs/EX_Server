@@ -6,19 +6,14 @@ using UnityEngine.AI;
 
 public class Zombie : NetworkBehaviour, IDamage
 {    
-    NavMeshAgent ZombieAgent;
-    Animator ZombieAnimator;
+    public NavMeshAgent ZombieAgent;
+    public Animator ZombieAnimator;
     private Transform targetTrans;
     private float ZombieHp;
     private float ZombieSpeed;
     private int ZombieAtk;
-    private bool Attack = true;
-
-    private void Start()
-    {
-        ZombieAgent = GetComponent<NavMeshAgent>();
-        ZombieAnimator = GetComponent<Animator>();
-    }
+   
+       
 
     public void SetZombie(float zombieHp, float zombieSpeed, int zombieAtk, Transform target)
     {
@@ -30,7 +25,7 @@ public class Zombie : NetworkBehaviour, IDamage
 
     private void Update()
     {
-        if (!GameManager.Instance.IsGameOver)
+        if (!GameManager.Instance.IsGameOver && gameObject.layer == LayerMask.NameToLayer("Zombie"))
         {
             ZombieMove(ZombieSpeed);
         }
@@ -39,41 +34,44 @@ public class Zombie : NetworkBehaviour, IDamage
     
     private void ZombieMove(float moveSpeed)
     {
-        SetMove(moveSpeed);
-    }
-
-    private void SetMove(float moveSpeed)
-    {
         if (targetTrans != null)
         {
-            ZombieAgent.speed = moveSpeed;
-
-            ZombieAgent.SetDestination(targetTrans.position);
 
             if (Vector3.Distance(transform.position, targetTrans.position) <= ZombieAgent.stoppingDistance)
             {
                 ZombieAgent.SetDestination(transform.position);
-                //ZombieAnimator.SetTrigger("Attack");
+                RpcAttack(true);
             }
+            else
+            {
+                RpcAttack(false);
+
+            }
+
+            ZombieAgent.SetDestination(targetTrans.position);
+            ZombieAgent.speed = moveSpeed;
         }
         else
-            Debug.Log("ÇöÀç Å¸°ÙÀÌ null");
+            SetTarget();
     }
 
-    public void OnAttack()
+    private void SetTarget()
     {
-        Attack = true;
+        targetTrans = GameManager.Instance.GetRandomLocalPlayerTransform();
     }
 
-    public void OffAttack()
+    [ClientRpc]
+    private void RpcAttack(bool isAttack)
     {
-        Attack = false;
+        ZombieAnimator.SetBool("Attack", isAttack);
     }
+
 
     [ServerCallback]
     public void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.layer == LayerMask.NameToLayer("Player") && Attack)
+        
+        if(other.gameObject.layer == LayerMask.NameToLayer("Player") && gameObject.layer == LayerMask.NameToLayer("Zombie"))
         {
             IDamage Hit = other.gameObject.GetComponent<IDamage>();
 
@@ -84,20 +82,56 @@ public class Zombie : NetworkBehaviour, IDamage
     [ServerCallback]
     public void TakeDamage(int damage)
     {
-        ZombieHp -= damage;
+        ZombieAgent.isStopped = true;
 
-        //ZombieAnimator.SetTrigger("Hit");
+        ZombieHp -= damage;
 
         if(ZombieHp <= 0)
         {
+            gameObject.layer = LayerMask.NameToLayer("DeadZombie");
+            ZombieAgent.isStopped = true;
+            ZombieAgent.ResetPath();
             Die();
         }
+        else
+        {
+            RpcHit();
+            StartCoroutine(HitAniamation());
+        }
+            
+    }
+
+    [ClientRpc]
+    private void RpcHit()
+    {
+        ZombieAnimator.SetTrigger("Hit");
+    }
+
+    private IEnumerator HitAniamation()
+    {
+        yield return new WaitForSeconds(2.0f);
+        ZombieAgent.isStopped = false;
     }
 
     public void Die()
     {
-        //ZombieAnimator.SetTrigger("Die");
+        RpcDie();
+        StartCoroutine(DieAnimation());
+    }
+
+    [ClientRpc]
+    private void RpcDie()
+    {
+        ZombieAnimator.SetTrigger("Die");
+    }
+   
+
+    private IEnumerator DieAnimation()
+    {
         GameManager.Instance.UnRegisterZombie(this);
+
+        yield return new WaitForSeconds(3.1f);
+
         NetworkServer.Destroy(this.gameObject);
     }
 }

@@ -24,7 +24,10 @@ public class PlayerHealth : Singleton<PlayerHealth>, IDamage
 
     void Update()
     {
-        SetHPBarOnUpdate(PlayerHp);
+        if(PlayerHp >= 0)
+        {
+            SetHPBarOnUpdate(PlayerHp);
+        }
     }
 
     private void SetHPBarOnUpdate(int health)
@@ -38,8 +41,16 @@ public class PlayerHealth : Singleton<PlayerHealth>, IDamage
     [Command]
     public void UnRegisterLocalPlayer()
     {
-        GameManager.Instance.UnRegisterPlayer(connectionToClient);
+        RpcOnDeadUI();
+        StartCoroutine(UnRegisterPlayer());
     }
+
+    private IEnumerator UnRegisterPlayer()
+    {
+        yield return new WaitForSeconds(0.1f);
+        gameObject.SetActive(false);
+    }
+
 
     [ServerCallback]
     public void TakeDamage(int damage)
@@ -49,6 +60,16 @@ public class PlayerHealth : Singleton<PlayerHealth>, IDamage
         if(PlayerHp <= 0)
         {
             UnRegisterLocalPlayer();
+        }
+    }
+
+    [ClientRpc]
+    private void RpcOnDeadUI()
+    {
+        if (isLocalPlayer)
+        {
+            UiManager.Instance.DeadUI();
+            UiManager.Instance.SetPlayerIdentity(netIdentity, gameObject);
         }
     }
 }

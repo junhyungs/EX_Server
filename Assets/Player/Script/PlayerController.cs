@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using Cinemachine;
+using TMPro;
 
 
 
@@ -48,7 +49,9 @@ public class PlayerController : NetworkBehaviour
     [SyncVar]
     private float m_Speed;
     [SyncVar]
-    private float m_BulletCount = 20;
+    private float m_MaxBulletCount = 20;
+    [SyncVar]//(hook = nameof(BulletText)) 해당 변수에 변화가 생길 때마다 메소드 실행
+    private float m_BulletCount = 0;
     [SyncVar]
     private bool OnFire = true;
 
@@ -58,6 +61,7 @@ public class PlayerController : NetworkBehaviour
     {
         m_BulletCount = 20;
         OnFire = true;
+        BulletText(m_BulletCount, m_MaxBulletCount);
     }
     
 
@@ -65,6 +69,8 @@ public class PlayerController : NetworkBehaviour
     {
         m_Controller = GetComponent<CharacterController>();
         m_Input = GetComponent<PlayerInput>();
+
+        m_BulletCount = m_MaxBulletCount;
     }
 
     public override void OnStartLocalPlayer()
@@ -96,7 +102,6 @@ public class PlayerController : NetworkBehaviour
             }
 
             RegisterLocalPlayer(transform);
-           
         }
     }
 
@@ -115,7 +120,7 @@ public class PlayerController : NetworkBehaviour
             return;
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && OnFire)
         {
             CommandAtk();
         }
@@ -223,7 +228,9 @@ public class PlayerController : NetworkBehaviour
         {
             m_BulletCount--;
 
-            if(m_BulletCount == 0)
+            BulletText(m_BulletCount, m_MaxBulletCount);
+
+            if (m_BulletCount == 0)
             {
                 OnFire = false;
             }
@@ -231,6 +238,15 @@ public class PlayerController : NetworkBehaviour
             GameObject bullet = Instantiate(m_prefab_AtkObject, m_Transform_AtkSpawnPos.position, m_Transform_AtkSpawnPos.rotation);
             NetworkServer.Spawn(bullet);
             RpcOnAttack();
+        }
+    }
+
+    [ClientRpc]
+    private void BulletText(float currentBullet, float maxBullet)
+    {
+        if (isLocalPlayer)
+        {
+            UiManager.Instance.UpdateBulletText(currentBullet, maxBullet);
         }
     }
 

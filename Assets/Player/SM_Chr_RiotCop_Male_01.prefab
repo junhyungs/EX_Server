@@ -4777,7 +4777,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Enabled: 1
-  m_Radius: 0.29
+  m_Radius: 0.27
   m_Height: 1.98
   m_Direction: 1
   m_Center: {x: 0, y: 1.01, z: 0}
@@ -6895,6 +6895,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5834157814267273361, guid: ad49a19d2c4adc94b838606a5d459f85, type: 3}
       propertyPath: looping
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5834157814267273361, guid: ad49a19d2c4adc94b838606a5d459f85, type: 3}
+      propertyPath: playOnAwake
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

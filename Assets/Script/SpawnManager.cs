@@ -14,6 +14,7 @@ public class SpawnManager : NetworkBehaviour
     public float SpawnSpeed = 1f;
     public float SpawnCount = 20f;
     private float SaveSpawnCount;
+    private float WaveCount = 4f;
 
     [SyncVar]
     private float EnemyHp = 1.0f;
@@ -27,20 +28,12 @@ public class SpawnManager : NetworkBehaviour
         Instance = this;
     }
 
-    public override void OnStartServer()
+    public IEnumerator ZombieSpawn()
     {
-        Debug.Log("게임 시작. 좀비 스폰을 시작합니다.");
         SaveSpawnCount = SpawnCount;
 
-        StartCoroutine(ZombieSpawn());
-    }
-
-    private IEnumerator ZombieSpawn()
-    {
-        Debug.Log("스폰 시작");
         while (!GameManager.Instance.IsGameOver)
-        {
-            
+        {    
             if (SpawnCount > 0)
             {
                 SpawnEnemy();
@@ -51,7 +44,7 @@ public class SpawnManager : NetworkBehaviour
 
             yield return new WaitForSeconds(SpawnTimer);
         }
-        Debug.Log("스폰완료");
+        
         SpawnCount = SaveSpawnCount;
     }
 
@@ -74,6 +67,7 @@ public class SpawnManager : NetworkBehaviour
         }
 
         SpawnTimer -= 0.5f;
+        WaveCount = 4f;
 
         StartCoroutine(ReadyTime());
     }
@@ -81,7 +75,14 @@ public class SpawnManager : NetworkBehaviour
     private IEnumerator ReadyTime()
     {
         Debug.Log("다음 레벨 준비시간");
-        yield return new WaitForSeconds(4.0f);
+
+        for(float i = WaveCount; i > 0; i--)
+        {
+            UiManager.Instance.NextWaveCount(i);
+            yield return new WaitForSeconds(1.0f);
+        }
+
+        UiManager.Instance.NextWave_ActiveFalse();
         StartCoroutine(ZombieSpawn());
     }
 
@@ -91,16 +92,13 @@ public class SpawnManager : NetworkBehaviour
         int randomPoint = Random.Range(0, ZombieSpawnPoint.Length);
 
         GameObject zombie = Instantiate(ZombieObject[randomZombie], ZombieSpawnPoint[randomPoint]);
-        PlayerTrans = GameManager.Instance.GetRandomLocalPlayerTransform();
 
-        if (PlayerTrans == null)
-        {
-            Debug.Log("플레이어의 트랜스폼을 부여받지 못했습니다.");
-            PlayerTrans = GameManager.Instance.GetRandomLocalPlayerTransform();
-        }
+        PlayerTrans = GameManager.Instance.GetRandomLocalPlayerTransform();
             
         Zombie zombieOBject = zombie.GetComponent<Zombie>();
+
         GameManager.Instance.RegisterZombie(zombieOBject);
+
         zombieOBject.SetZombie(EnemyHp, EnemySpeed, EnemyAtk, PlayerTrans);
 
         NetworkServer.Spawn(zombie);
