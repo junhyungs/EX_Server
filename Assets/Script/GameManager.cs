@@ -141,10 +141,11 @@ public class GameManager : NetworkManager
         UiManager.Instance.RpcLevelText(gameLevel);
     }
 
-    
+
+    [Server]
     public void RespawnPlayer(NetworkConnection conn, GameObject player)
     {
-        if(player != null)
+        if(player != null && LocalPlayer_Transform.ContainsKey(conn))
         {
             player.transform.position = RespawnPosition.position;
 

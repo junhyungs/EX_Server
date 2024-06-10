@@ -38,17 +38,23 @@ public class PlayerHealth : Singleton<PlayerHealth>, IDamage
         TextMesh_HealthBar.text = new string('-', health);
     }
 
-    [Command]
+
     public void UnRegisterLocalPlayer()
     {
-        RpcOnDeadUI();
-        StartCoroutine(UnRegisterPlayer());
+        //StartCoroutine(UnRegisterPlayer());
+        EnablePlayer();
+    }
+
+    [Command]
+    private void EnablePlayer()
+    {
+        gameObject.SetActive(false);
     }
 
     private IEnumerator UnRegisterPlayer()
     {
         yield return new WaitForSeconds(0.1f);
-        gameObject.SetActive(false);
+        
     }
 
 
@@ -60,7 +66,13 @@ public class PlayerHealth : Singleton<PlayerHealth>, IDamage
         if(PlayerHp <= 0)
         {
             UnRegisterLocalPlayer();
+            TestDeadUI();
         }
+    }
+
+    private void TestDeadUI()
+    {
+        RpcOnDeadUI();
     }
 
     [ClientRpc]

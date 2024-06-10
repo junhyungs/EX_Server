@@ -50,11 +50,13 @@ public class UiManager : NetworkBehaviour
         DeadObject.SetActive(false);
     }
 
+    
     public void OnRespawnButton()
     {
         HideDeadUI();
         GameManager.Instance.RespawnPlayer(playerIdentity.connectionToClient, player);
     }
+
 
     public void OnExitButton()
     {
