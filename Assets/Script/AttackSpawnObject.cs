@@ -5,7 +5,7 @@ using Mirror;
 using Unity.VisualScripting;
 
 
-public class AttackSpawnObject : NetworkBehaviour
+public class AttackSpawnObject : NetworkBehaviour //ÃÑ¾Ë
 {
     private float m_ActiveTime = 5.0f;
     private float m_ForcePower = 2000f;

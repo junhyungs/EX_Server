@@ -57,7 +57,7 @@ public class PlayerController : NetworkBehaviour
 
 
     [Command]
-    public void Reload()
+    public void Reload() //재장전 애니메이션 이벤트
     {
         m_BulletCount = 20;
         OnFire = true;
@@ -120,12 +120,12 @@ public class PlayerController : NetworkBehaviour
             return;
         }
 
-        if (Input.GetMouseButtonDown(0) && OnFire)
+        if (Input.GetMouseButtonDown(0) && OnFire) //총 발사부분
         {
             CommandAtk();
         }
 
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R)) //재장전
         {
             CommandReloading();
         }
@@ -197,13 +197,13 @@ public class PlayerController : NetworkBehaviour
     }
 
     [Command]
-    private void CommandReloading()
+    private void CommandReloading() //재장전
     {
         ReloadAnimation();
     }
 
     [ClientRpc]
-    private void ReloadAnimation()
+    private void ReloadAnimation() //재장전
     {
         m_Animator.SetTrigger("Reloading");
     }
@@ -221,7 +221,7 @@ public class PlayerController : NetworkBehaviour
         m_Animator.SetFloat("MovePosZ", speed * input.y);
     }
 
-    [Command]
+    [Command] //총 발사부분
     private void CommandAtk()
     {
         if (OnFire)
@@ -251,7 +251,7 @@ public class PlayerController : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void RpcOnAttack()
+    private void RpcOnAttack() //발사 애니메이션
     {
         m_Animator.SetTrigger("Fire");
 
